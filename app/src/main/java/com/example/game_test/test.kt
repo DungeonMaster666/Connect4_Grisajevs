@@ -191,8 +191,8 @@ fun checkDraw(count:Int): Boolean {
 
 
 
-fun checkWin(array: Array<IntArray>,count:Int){
-    if(!checkDraw(count)) {
+fun checkWin(array: Array<IntArray>,count:Int) {
+    if (!checkDraw(count)) {
         if (!CheckHorizontal(array)) {
             if (!CheckVertical(array)) {
                 if (!CheckDiagonalRight(array)) {
@@ -200,54 +200,7 @@ fun checkWin(array: Array<IntArray>,count:Int){
                         if (!CheckDiagonalLeft(array)) {
                             if (!CheckDiagonalLeft2(array)) {
                                 return
-                            } else {
-                                if (p1win) println("WIN P1 BY DIAGONAL");
-
-                                else println("WIN P2 BY DIAGONAL")
                             }
-                        } else {
-                            if (p1win) println("WIN P1 BY DIAGONAL")
-                            else println("WIN P2 BY DIAGONAL")
-                        }
-                    } else {
-                        if (p1win) println("WIN P1 BY DIAGONAL")
-                        else println("WIN P2 BY DIAGONAL")
-                    }
-                } else {
-                    if (p1win) println("WIN P1 BY DIAGONAL")
-                    else println("WIN P2 BY DIAGONAL")
-                }
-            } else {
-                if (p1win) println("WIN P1 BY VERTICAL")
-                else println("WIN P2 BY VERTICAL")
-            }
-        } else {
-            if (p1win) println("WIN P1 BY HORIZONTAL")
-            else println("WIN P2 BY HORIZONTAL")
-        }
-
-    }
-}
-
-
-fun main(args: Array<String>) {
-    val rows = 6
-    val coll = 7
-    val array = Array(rows) {
-        IntArray(coll)
-    }
-
-
-
-    arrprint(array)
-
-    if (!CheckHorizontal(array)) {
-        if (!CheckVertical(array)) {
-            if (!CheckDiagonalRight(array)) {
-                if (!CheckDiagonalRight2(array)) {
-                    if (!CheckDiagonalLeft(array)) {
-                        if (!CheckDiagonalLeft2(array)) {
-                            println("IT'S DRAW!")
                         }
                     }
                 }

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
+import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 
 class MainActivity2 : AppCompatActivity() {
@@ -19,19 +20,49 @@ class MainActivity2 : AppCompatActivity() {
         builder.setView(dialogLayout)
 
         builder.setPositiveButton("OK") { _, _ ->
-            val name1 = editText.text.toString()
 
+            if (editText.text.isEmpty()){
+                errorMsgDialog(null,"Field must be filled!",withEditText_AI(null,AIFlag))
+            }
 
+            else{
+                val name1 = editText.text.toString()
+                val intent3 = Intent(this, MainActivity::class.java)
 
-            val intent3 = Intent(this, MainActivity::class.java)
-            intent3.putExtra("name1",name1)
-            intent3.putExtra("nameFlag",1)
-            intent3.putExtra("AIFlag",1)
-            startActivity(intent3)
+                intent3.putExtra("name1",name1)
+                intent3.putExtra("nameFlag",1)
+                intent3.putExtra("AIFlag",1)
+
+                finish()
+                startActivity(intent3)
+            }
+
 
         }
         builder.show()
     }
+
+    fun errorMsgDialog(view: View?, message:String, withEditText1:Unit){
+
+        val alertDialog = AlertDialog.Builder(this).create()
+        alertDialog.setTitle("Error")
+        alertDialog.setMessage(message)
+
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE,"CLOSE") { dialog, which ->
+            alertDialog.dismiss()
+            withEditText1
+        }
+
+        alertDialog.show()
+
+        val btnPositive = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+
+        val layoutParams = btnPositive.layoutParams as LinearLayout.LayoutParams
+        layoutParams.weight = 10f
+        btnPositive.layoutParams = layoutParams
+
+    }
+
 
     fun withEditText1(view: View?) {
         val builder = AlertDialog.Builder(this)
@@ -42,28 +73,43 @@ class MainActivity2 : AppCompatActivity() {
         val editText = dialogLayout.findViewById<EditText>(R.id.editText)
         builder.setView(dialogLayout)
 
+
+
+
         builder.setPositiveButton("OK") { _, _ ->
-            val name1 = editText.text.toString()
 
-            val builder2 = AlertDialog.Builder(this)
-            val inflater2 = layoutInflater
-            builder2.setTitle("Enter your second player name!")
-            builder2.setCancelable(false)
-            val dialogLayout2 = inflater2.inflate(R.layout.player_name, null)
-            val editText2 = dialogLayout2.findViewById<EditText>(R.id.editText)
-            builder2.setView(dialogLayout2)
-            builder2.setPositiveButton("OK") { _, _ ->
-
-                val name2 = editText2.text.toString()
-
-                val intent3 = Intent(this, MainActivity::class.java)
-                intent3.putExtra("name1",name1)
-                intent3.putExtra("name2",name2)
-                intent3.putExtra("nameFlag",1)
-                startActivity(intent3)
-
+            if (editText.text.isEmpty()){
+                errorMsgDialog(null,"Field must be filled!",withEditText1(null))
             }
-            builder2.show()
+            else{
+                val name1 = editText.text.toString()
+
+                val builder2 = AlertDialog.Builder(this)
+                val inflater2 = layoutInflater
+                builder2.setTitle("Enter your second player name!")
+                builder2.setCancelable(false)
+                val dialogLayout2 = inflater2.inflate(R.layout.player_name, null)
+                val editText2 = dialogLayout2.findViewById<EditText>(R.id.editText)
+                builder2.setView(dialogLayout2)
+                builder2.setPositiveButton("OK") { _, _ ->
+                    if (editText2.text.isEmpty()){
+                        errorMsgDialog(null,"Field must be filled!",withEditText1(null))
+                    }
+                    else{
+                        val name2 = editText2.text.toString()
+
+                        val intent3 = Intent(this, MainActivity::class.java)
+                        intent3.putExtra("name1",name1)
+                        intent3.putExtra("name2",name2)
+                        intent3.putExtra("nameFlag",1)
+                        finish()
+                        startActivity(intent3)
+                    }
+
+
+                }
+                builder2.show()
+            }
 
 
         }

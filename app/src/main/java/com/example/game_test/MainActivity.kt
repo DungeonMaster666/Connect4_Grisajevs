@@ -11,6 +11,8 @@ import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.OvalShape
 import android.graphics.drawable.shapes.RectShape
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -37,7 +39,7 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("name1",name1)
             intent.putExtra("name2",name2)
             if (AIFlag==1) intent.putExtra("AIFlag",1)
-
+            finish()
             startActivity(intent)
              }
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,"CLOSE GAME") { dialog, which ->
@@ -71,7 +73,9 @@ class MainActivity : AppCompatActivity() {
 
         val newGameFlag= intent.extras?.getInt("newGameFlag")
         if(nameFlag!=1 && newGameFlag!=1){
+
             val intent= Intent(this, Main_menu::class.java)
+            finish()
             startActivity(intent)
         }
 
@@ -80,7 +84,6 @@ class MainActivity : AppCompatActivity() {
 
         val width = Resources.getSystem().displayMetrics.widthPixels
         val height= Resources.getSystem().displayMetrics.heightPixels
-
         val bitmap: Bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas: Canvas = Canvas(bitmap)
 
@@ -98,7 +101,11 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
+        val line0: ShapeDrawable = ShapeDrawable(RectShape()).also {
+            it.setBounds( 0, top, 5, bottom)
+        }
+        line0.paint.color = Color.parseColor("#F6891F")
+        line0.draw(canvas)
 
 
         val line1: ShapeDrawable = ShapeDrawable(RectShape()).also {
@@ -141,7 +148,18 @@ class MainActivity : AppCompatActivity() {
         line6.draw(canvas)
 
 
+        val line7: ShapeDrawable = ShapeDrawable(RectShape()).also {
+            it.setBounds( width-5, top, width, bottom)
+        }
+        line7.paint.color = Color.parseColor("#F6891F")
+        line7.draw(canvas)
 
+
+        val yline0: ShapeDrawable = ShapeDrawable(RectShape()).also {
+            it.setBounds( left, 0, width , 10)
+        }
+        yline0.paint.color = Color.parseColor("#F6891F")
+        yline0.draw(canvas)
 
         val yline1: ShapeDrawable = ShapeDrawable(RectShape()).also {
             it.setBounds( left, height/6, width , round(height/5.9).toInt())
@@ -388,7 +406,6 @@ class MainActivity : AppCompatActivity() {
                     ++Turn
 
                     olist[index].draw(canvas)
-                    arrprint(array)
                     counter++
                     if(contCheckWin(array,counter)) break
                     AI_turn()
@@ -420,7 +437,6 @@ class MainActivity : AppCompatActivity() {
                     }
                     ++Turn
                     olist[index].draw(canvas)
-                    arrprint(array)
                     counter++
 
 
@@ -455,7 +471,6 @@ class MainActivity : AppCompatActivity() {
                     }
                     ++Turn
                     olist[index].draw(canvas)
-                    arrprint(array)
                     counter++
 
 
@@ -491,7 +506,6 @@ class MainActivity : AppCompatActivity() {
 
                     olist[index].draw(canvas)
 
-                    arrprint(array)
                     counter++
 
 
@@ -527,7 +541,6 @@ class MainActivity : AppCompatActivity() {
 
                     olist[index].draw(canvas)
 
-                    arrprint(array)
                     counter++
 
                     if(contCheckWin(array,counter)) break
@@ -563,7 +576,6 @@ class MainActivity : AppCompatActivity() {
 
                     olist[index].draw(canvas)
 
-                    arrprint(array)
                     counter++
 
                     if(contCheckWin(array,counter)) break
@@ -602,7 +614,6 @@ class MainActivity : AppCompatActivity() {
 
                     olist[index].draw(canvas)
 
-                    arrprint(array)
                     counter++
 
                     if(contCheckWin(array,counter)) break
@@ -617,8 +628,28 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
+//https://devofandroid.blogspot.com/2018/03/add-itemsmenu-in-actionbartoolbar.html
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle action bar item clicks here.
+        val id = item.itemId
 
+        if (id == R.id.home_but) {
+            val intent= Intent(this, Main_menu::class.java)
+            finish()
+            startActivity(intent)
+
+        }
+
+        return super.onOptionsItemSelected(item)
+
+    }
+
+//https://devofandroid.blogspot.com/2018/03/add-itemsmenu-in-actionbartoolbar.html
 }
 
 
