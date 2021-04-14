@@ -25,7 +25,7 @@ import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
 
-
+//// MARKS GRISAJEVS 2.GRUPA 191RDB191
 
     fun withButtonCentered(view: View?, title:String, message:String,name1:String,name2:String, AIFlag:Int?) {
 
