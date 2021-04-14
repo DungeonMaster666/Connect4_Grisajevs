@@ -12,6 +12,7 @@ class Main_menu : AppCompatActivity() {
         setContentView(R.layout.activity_main_menu)
 
         val but= findViewById<Button>(R.id.button)
+        val but7= findViewById<Button>(R.id.button7)
 
 
         but.setOnClickListener{
@@ -19,7 +20,11 @@ class Main_menu : AppCompatActivity() {
             startActivity(intent)
         }
 
-
+        but7.setOnClickListener{
+            val intent= Intent(this, MainActivity2::class.java)
+            intent.putExtra("AIFlag",1)
+            startActivity(intent)
+        }
 
     }
 }

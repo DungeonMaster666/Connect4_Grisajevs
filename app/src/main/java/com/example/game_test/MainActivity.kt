@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    fun withButtonCentered(view: View?, title:String, message:String,name1:String,name2:String) {
+    fun withButtonCentered(view: View?, title:String, message:String,name1:String,name2:String, AIFlag:Int?) {
 
         val alertDialog = AlertDialog.Builder(this).create()
         alertDialog.setTitle(title)
@@ -36,6 +36,8 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("newGameFlag",1)
             intent.putExtra("name1",name1)
             intent.putExtra("name2",name2)
+            if (AIFlag==1) intent.putExtra("AIFlag",1)
+
             startActivity(intent)
              }
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,"CLOSE GAME") { dialog, which ->
@@ -55,10 +57,14 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         p1win=false
         p2win=false
         draw=false
+
+
 
         val nameFlag = intent.extras?.getInt("nameFlag")
 
@@ -283,6 +289,19 @@ class MainActivity : AppCompatActivity() {
         olist.add(oval41)
         olist.add(oval42)
 
+        val AIFlag = intent.extras?.getInt("AIFlag")
+
+        val arrayOfBut=mutableListOf<Button>()
+
+        if(AIFlag==1){
+            arrayOfBut.add(but0)
+            arrayOfBut.add(but1)
+            arrayOfBut.add(but2)
+            arrayOfBut.add(but3)
+            arrayOfBut.add(but4)
+            arrayOfBut.add(but5)
+            arrayOfBut.add(but6)
+        }
 
 
         var counter:Int=0
@@ -292,24 +311,61 @@ class MainActivity : AppCompatActivity() {
             val name2 = intent.getStringExtra("name2").toString()
 
 
-        if (nameFlag==1 || newGameFlag==1)  Toast.makeText(this@MainActivity, "Good luck, $name1, good luck, $name2, may the Force be with you", Toast.LENGTH_LONG).show()
+
+
+        if ((nameFlag==1 || newGameFlag==1) && AIFlag==0)  Toast.makeText(this@MainActivity, "Good luck, $name1, good luck, $name2, may the Force be with you", Toast.LENGTH_LONG).show()
+        if ((nameFlag==1 || newGameFlag==1) && AIFlag==1)  Toast.makeText(this@MainActivity, "Good luck, $name1, may the Force be with you", Toast.LENGTH_LONG).show()
 
 
 
+        fun AI_turn(){
 
-        fun contCheckWin(array: Array<IntArray>,counter:Int){
-            checkWin(array,counter)
-            if (p1win){
-                withButtonCentered(null,"WOW","Congratulations, $name1, you won this game. Check and mate, $name2!",name1,name2)
+            if (AIFlag==1){
+                if (Turn%2==0) {
+                    val random = (0..6).random()
+                    arrayOfBut[random].performClick()
+                }
             }
-            if (p2win) withButtonCentered(null,"WOW","Congratulations, $name2, you won this game. Check and mate, $name1!",name1,name2)
-            if (draw) withButtonCentered(null,"Unfortunately","This game ended by draw, have a good luck next time!",name1,name2)
         }
 
 
+        fun contCheckWin(array: Array<IntArray>,counter:Int):Boolean{
+            checkWin(array,counter)
+            if (AIFlag==0){
+                if (p1win){
+                    withButtonCentered(null,"WOW","Congratulations, $name1, you won this game. Check and mate, $name2!",name1,name2,AIFlag)
+                    return true
+                }
+                if (p2win) {
+                    withButtonCentered(null,"WOW","Congratulations, $name2, you won this game. Check and mate, $name1!",name1,name2,AIFlag)
+                    return true
+                }
+                if (draw) {
+                    withButtonCentered(null,"Unfortunately","This game ended by draw, have a good luck next time!",name1,name2,AIFlag)
+                    return true
+                }
+            }
+            else {
+                if (p1win){
+                    withButtonCentered(null,"WOW","Congratulations, $name1, you won this game. Check and mate, piece of junk!",name1,name2,AIFlag)
+                    return true
+                }
+                if (p2win){
+                    withButtonCentered(null,"WOW","Congratulations, my little quantum processor , you won this game. Check and mate, $name1!",name1,name2,AIFlag)
+                    return true
+                }
+                if (draw){
+                    withButtonCentered(null,"Unfortunately","This game ended by draw, have a good luck next time!",name1,name2,AIFlag)
+                    return true
+                }
+            }
+            return false
+        }
+
+
+
+
         but0.setOnClickListener{
-
-
 
             imageV.background = BitmapDrawable(resources, bitmap)
 
@@ -334,8 +390,8 @@ class MainActivity : AppCompatActivity() {
                     olist[index].draw(canvas)
                     arrprint(array)
                     counter++
-                    contCheckWin(array,counter)
-
+                    if(contCheckWin(array,counter)) break
+                    AI_turn()
                     break
                 }
             }
@@ -368,7 +424,8 @@ class MainActivity : AppCompatActivity() {
                     counter++
 
 
-                    contCheckWin(array,counter)
+                    if(contCheckWin(array,counter)) break
+                    AI_turn()
 
                     break
                 }
@@ -402,7 +459,8 @@ class MainActivity : AppCompatActivity() {
                     counter++
 
 
-                    contCheckWin(array,counter)
+                    if(contCheckWin(array,counter)) break
+                    AI_turn()
 
                     break
                 }
@@ -437,7 +495,8 @@ class MainActivity : AppCompatActivity() {
                     counter++
 
 
-                    contCheckWin(array,counter)
+                    if(contCheckWin(array,counter)) break
+                    AI_turn()
 
                     break
                 }
@@ -471,7 +530,8 @@ class MainActivity : AppCompatActivity() {
                     arrprint(array)
                     counter++
 
-                    contCheckWin(array,counter)
+                    if(contCheckWin(array,counter)) break
+                    AI_turn()
 
                     break
                 }
@@ -506,7 +566,9 @@ class MainActivity : AppCompatActivity() {
                     arrprint(array)
                     counter++
 
-                    contCheckWin(array,counter)
+                    if(contCheckWin(array,counter)) break
+                    AI_turn()
+
                     break
                 }
             }
@@ -543,7 +605,8 @@ class MainActivity : AppCompatActivity() {
                     arrprint(array)
                     counter++
 
-                    contCheckWin(array,counter)
+                    if(contCheckWin(array,counter)) break
+                    AI_turn()
 
                     break
                 }

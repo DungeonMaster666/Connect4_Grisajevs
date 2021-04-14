@@ -9,8 +9,31 @@ import androidx.appcompat.app.AlertDialog
 
 class MainActivity2 : AppCompatActivity() {
 
-    fun withEditText1(view: View?) {
+    fun withEditText_AI(view: View?, AIFlag:Int) {
+        val builder = AlertDialog.Builder(this)
+        val inflater = layoutInflater
+        builder.setTitle("Enter your player name!")
+        builder.setCancelable(false)
+        val dialogLayout = inflater.inflate(R.layout.player_name, null)
+        val editText = dialogLayout.findViewById<EditText>(R.id.editText)
+        builder.setView(dialogLayout)
 
+        builder.setPositiveButton("OK") { _, _ ->
+            val name1 = editText.text.toString()
+
+
+
+            val intent3 = Intent(this, MainActivity::class.java)
+            intent3.putExtra("name1",name1)
+            intent3.putExtra("nameFlag",1)
+            intent3.putExtra("AIFlag",1)
+            startActivity(intent3)
+
+        }
+        builder.show()
+    }
+
+    fun withEditText1(view: View?) {
         val builder = AlertDialog.Builder(this)
         val inflater = layoutInflater
         builder.setTitle("Enter your first player name!")
@@ -52,7 +75,10 @@ class MainActivity2 : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main2)
-        withEditText1(null)
+        val AIFlag = intent.extras?.getInt("AIFlag")
+
+        if (AIFlag==1) withEditText_AI(null,AIFlag)
+        else withEditText1(null)
 
     }
 }
