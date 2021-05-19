@@ -494,7 +494,7 @@ class MainActivity : AppCompatActivity() {
         // After checking array(node) for terminal state or depth 0, in cycle of all available columns(a.k.a all possible movements) make a temporary array, in which makes all changes to prevent original array from changing.
         // Make a turn in temporary array and applies minimax to this temporary array with a turn (Recursion activated)
         // As terminal node or depth is reached 0, algorithm starts evaluating arrays and return heuristic values of them in descent order because of recursion (how minimax works)
-        // Returning values, they are evaluating by each other to find a most profitable turn ( column, in which AI will make a turn)
+        // Returning values, they are evaluating by each other to find a most profitable turn (column, in which AI will make a turn)
         // With alpha-beta pruning algorithm cuts off unprofitable turns, increasing speed of AI decision
 
         fun minimax(array: Array<IntArray>, depth: Int,alpha:Int, beta:Int, maximizingPlayer:Boolean,first_move:String):Array<Int>{
@@ -545,11 +545,14 @@ class MainActivity : AppCompatActivity() {
                     var row = getNextEmptyRow(array, col)
                     var temp_array=array.copy()
                     var temp_array2=makeTurn(temp_array,row,col,AI_piece)
+                    // Make a turn in temporary array and applies minimax to this temporary array with a turn (Recursion activated)
                     var minimax_array = minimax(temp_array2, depth-1, alpha1, beta1, false,first_move)
+                    // Returning values, they are evaluating by each other to find a most profitable turn (column, in which AI will make a turn)
                     if (minimax_array[1]>value){
                         value=minimax_array[1]
                         column=col
                     }
+                    // With alpha-beta pruning algorithm cuts off unprofitable turns, increasing speed of AI decision
                     alpha1=maxOf(alpha1,value)
                     if (alpha1>=beta1){
                         break
@@ -568,11 +571,14 @@ class MainActivity : AppCompatActivity() {
                     var row = getNextEmptyRow(array, col)
                     var temp_array=array.copy()
                     var temp_array2=makeTurn(temp_array,row,col,Player_piece)
+                    // Make a turn in temporary array and applies minimax to this temporary array with a turn (Recursion activated)
                     var minimax_array = minimax(temp_array2, depth-1, alpha1, beta1, true,first_move)
+                    // Returning values, they are evaluating by each other to find a most profitable turn (column, in which AI will make a turn)
                     if (minimax_array[1]<value){
                         value=minimax_array[1]
                         column=col
                     }
+                    // With alpha-beta pruning algorithm cuts off unprofitable turns, increasing speed of AI decision
                     beta1=minOf(beta1,value)
                     if (alpha1>=beta1){
                         break
