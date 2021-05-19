@@ -209,7 +209,6 @@ class MainActivity : AppCompatActivity() {
             IntArray(colls)
         }
         var Turn = 1
-        var p=0
 
         val p1 = 1
         val p2 = 2
@@ -424,15 +423,14 @@ class MainActivity : AppCompatActivity() {
             var score=0
             var opp_piece=Player
             var piece = AI
-            if (piece==Player) opp_piece = AI
+
 
             if ((area.count {it==piece})==4) score+=1000
             else if (((area.count {it==piece})==3) && ((area.count {it==0})==1)) score+=10
             else if (((area.count {it==piece})==2) && ((area.count {it==0})==2)) score+=4
-            if (((area.count {it==opp_piece})==3) && ((area.count {it==0})==1)) score-=8
+            else if (((area.count {it==opp_piece})==3) && ((area.count {it==0})==1)) score-=8
 
             return score
-
 
         }
 
@@ -593,7 +591,7 @@ class MainActivity : AppCompatActivity() {
             if (AIFlag==1){
                 if (first_move=="Player"){
                     if (Turn%2==0) {
-                        val minimax_final=minimax(array,4, Int.MIN_VALUE, Int.MAX_VALUE,false,first_move)
+                        val minimax_final=minimax(array,5, Int.MIN_VALUE, Int.MAX_VALUE,false,first_move)
                         // println(minimax_final[1])
 
                         arrayOfBut[minimax_final[0]].performClick()
@@ -601,7 +599,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 else if(first_move=="AI") {
                     if ((Turn%2!=0)) {
-                        val minimax_final=minimax(array,4, Int.MIN_VALUE, Int.MAX_VALUE,true,first_move)
+                        val minimax_final=minimax(array,5, Int.MIN_VALUE, Int.MAX_VALUE,true,first_move)
                         // println(minimax_final[1])
 
                         arrayOfBut[minimax_final[0]].performClick()
