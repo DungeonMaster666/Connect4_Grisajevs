@@ -183,7 +183,6 @@ fun CheckDiagonalLeft2(array: Array<IntArray>): Boolean { //LEFT DIAGONAL on the
 
 fun checkDraw(count:Int): Boolean {
     return if ((count==42)&& (!p1win)&&(!p2win)){
-        println("IT'S DRAW!")
         draw=true
         true
     } else false

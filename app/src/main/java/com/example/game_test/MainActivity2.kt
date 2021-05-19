@@ -26,21 +26,62 @@ class MainActivity2 : AppCompatActivity() {
             }
 
             else{
-                val name1 = editText.text.toString()
-                val intent3 = Intent(this, MainActivity::class.java)
 
-                intent3.putExtra("name1",name1)
-                intent3.putExtra("nameFlag",1)
-                intent3.putExtra("AIFlag",1)
+                val alertDialog = AlertDialog.Builder(this).create()
+                alertDialog.setTitle("First move")
+                alertDialog.setMessage("Choose who'll start the game")
+                var first_move="none"
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "AI"
+                ) { _, _ ->
+                    first_move="AI"
+                    val name1 = editText.text.toString()
+                    val intent3 = Intent(this, MainActivity::class.java)
 
-                finish()
-                startActivity(intent3)
+                    intent3.putExtra("name1",name1)
+                    intent3.putExtra("nameFlag",1)
+                    intent3.putExtra("AIFlag",1)
+                    intent3.putExtra("first_move",first_move)
+
+                    finish()
+                    startActivity(intent3)
+                }
+
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Player"
+                ) { _, _ ->
+                    first_move="Player"
+                    val name1 = editText.text.toString()
+                    val intent3 = Intent(this, MainActivity::class.java)
+
+                    intent3.putExtra("name1",name1)
+                    intent3.putExtra("nameFlag",1)
+                    intent3.putExtra("AIFlag",1)
+                    intent3.putExtra("first_move",first_move)
+
+                    finish()
+                    startActivity(intent3)}
+                alertDialog.show()
+
+                val btnPositive = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                val btnNegative = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+
+                val layoutParams = btnPositive.layoutParams as LinearLayout.LayoutParams
+                layoutParams.weight = 10f
+                btnPositive.layoutParams = layoutParams
+                btnNegative.layoutParams = layoutParams
+
+
             }
 
 
         }
         builder.show()
     }
+
+    fun AI_choice(view: View) {
+
+
+    }
+
 
     fun errorMsgDialog(view: View?, message:String, withEditText1:Unit){
 
@@ -50,7 +91,6 @@ class MainActivity2 : AppCompatActivity() {
 
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE,"CLOSE") { dialog, which ->
             alertDialog.dismiss()
-            withEditText1
         }
 
         alertDialog.show()
