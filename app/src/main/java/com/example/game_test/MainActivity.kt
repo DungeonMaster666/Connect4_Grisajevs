@@ -18,6 +18,8 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import kotlin.Float.Companion.NEGATIVE_INFINITY
+import kotlin.Float.Companion.POSITIVE_INFINITY
 import kotlin.math.round
 import kotlin.system.exitProcess
 
@@ -27,7 +29,7 @@ class MainActivity : AppCompatActivity() {
 
 //// MARKS GRISAJEVS 2.GRUPA 191RDB191
 
-    fun withButtonCentered(view: View?, title:String, message:String,name1:String,name2:String, AIFlag:Int?) {
+    fun withButtonCentered(view: View?, title:String, message:String,name1:String,name2:String, AIFlag:Int?, first_move:String) {
 
         val alertDialog = AlertDialog.Builder(this).create()
         alertDialog.setTitle(title)
@@ -39,6 +41,9 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("name1",name1)
             intent.putExtra("name2",name2)
             if (AIFlag==1) intent.putExtra("AIFlag",1)
+            if (first_move=="AI") intent.putExtra("first_move","AI")
+            if (first_move=="Player") intent.putExtra("first_move","Player")
+
             finish()
             startActivity(intent)
              }
@@ -334,48 +339,301 @@ class MainActivity : AppCompatActivity() {
         if ((nameFlag==1 || newGameFlag==1) && AIFlag==0)  Toast.makeText(this@MainActivity, "Good luck, $name1, good luck, $name2, may the Force be with you", Toast.LENGTH_LONG).show()
         if ((nameFlag==1 || newGameFlag==1) && AIFlag==1)  Toast.makeText(this@MainActivity, "Good luck, $name1, may the Force be with you", Toast.LENGTH_LONG).show()
 
+        val first_move = intent.getStringExtra("first_move").toString()
 
 
-        fun AI_turn(){
 
-            if (AIFlag==1){
-                if (Turn%2==0) {
-                    val random = (0..6).random()
-                    arrayOfBut[random].performClick()
+
+
+        fun Array<IntArray>.copy() = Array(size) { get(it).clone() }
+
+        fun empty_col(t_array: Array<IntArray>,coll:Int):Boolean{
+            val first_row=0
+            return t_array[first_row][coll] == 0
+        }
+
+        fun getAllEmptyCol(t_array: Array<IntArray>):MutableList<Int>{
+            val emptyColl= mutableListOf<Int>()
+            for (coll in 0..6){
+                if (empty_col(t_array, coll)) emptyColl.add(coll)
+            }
+            return emptyColl
+        }
+
+        fun getNextEmptyRow(t_array: Array<IntArray>,coll:Int):Int{
+            for(r in 5 downTo 0){
+                if (t_array[r][coll]==0) return r
+            }
+            return 0
+        }
+
+        fun makeTurn(t_array: Array<IntArray>,row:Int,coll:Int,player:Int):Array<IntArray>{
+            var temp_array=t_array.copy()
+            temp_array[row][coll]=player
+            return temp_array
+        }
+
+        fun isTerminal(t_array: Array<IntArray>,temp_counter:Int,first_move:String):Array<Boolean> {
+            checkWin(t_array, temp_counter)
+            var Player_win=false
+            var AI_win=false
+            if (first_move=="Player"){
+                Player_win=p1win
+                AI_win=p2win
+            }
+            else if (first_move=="AI"){
+                Player_win=p2win
+                AI_win=p1win
+            }
+            var tDraw=draw
+            p1win=false
+            p2win=false
+            draw=false
+            val t_array= arrayOf(Player_win,AI_win,tDraw)
+            return t_array
+        }
+
+        fun makeColArray(t_array:Array<IntArray>,column:Int):MutableList<Int>{
+            var col_array=mutableListOf<Int>()
+            for (r in 5 downTo 0){
+                col_array.add(t_array[r][column])
+            }
+            return col_array
+        }
+
+        fun makeRowArray(t_array:Array<IntArray>,row:Int):MutableList<Int>{
+            var row_array=mutableListOf<Int>()
+                for (c in 0..6){
+                    row_array.add(t_array[row][c])
                 }
+
+            return row_array
+        }
+
+
+
+        fun evaluateArea(area: MutableList<Int>, AI:Int ,Player:Int):Int{
+            var score=0
+            var opp_piece=Player
+            var piece = AI
+            if (piece==Player) opp_piece = AI
+
+            if ((area.count {it==piece})==4) score+=100
+            else if (((area.count {it==piece})==3) && ((area.count {it==0})==1)) score+=5
+            else if (((area.count {it==piece})==2) && ((area.count {it==0})==2)) score+=2
+            if (((area.count {it==opp_piece})==3) && ((area.count {it==0})==1)) score-=4
+
+            return score
+
+
+        }
+
+
+
+        fun heuristicValue(t_array: Array<IntArray>, AI:Int ,Player:Int):Int{
+            var score:Int=0
+            var center_array=mutableListOf<Int>()
+            for (r in 5 downTo 0){
+                center_array.add(t_array[r][3])
+            }
+
+            var centerCount=center_array.count {it==AI}
+            score+=centerCount*3
+
+            // Horizontal
+            for (r in 5 downTo 0){
+                var row_array=makeRowArray(t_array,r)
+                for (c in 0..3){
+                    var window=row_array.subList(c,c+4)
+                    score+= evaluateArea(window,AI,Player)
+                }
+            }
+            //Vertical
+            for (c in 0..6){
+                var col_array=makeColArray(t_array,c)
+                for (r in 5 downTo 3){
+                    var window=col_array.subList(5-r,9-r)
+                    score+=evaluateArea(window,AI,Player)
+                }
+            }
+            // Diagonal
+
+            for (r in 5 downTo 3){
+                for (c in 0..3){
+                    var window=mutableListOf<Int>()
+                    for (i in 0..3){
+                        window.add(t_array[r-i][c+i])
+                    }
+                    score+=evaluateArea(window,AI,Player)
+                }
+            }
+
+            for (r in 5 downTo 3){
+                for (c in 0..3){
+                    var window=mutableListOf<Int>()
+                    for (i in 0..3){
+                        window.add(t_array[r-i][c+3-i])
+                    }
+                    score+=evaluateArea(window,AI,Player)
+                }
+            }
+
+        return score
+        }
+
+        fun minimax(array: Array<IntArray>, depth: Int,alpha:Int, beta:Int, maximizingPlayer:Boolean,first_move:String):Array<Int>{
+            var minimax_array: Array<Int>
+            var AI_piece:Int=1
+            var Player_piece:Int=2
+
+            if (first_move=="Player"){
+                Player_piece=p1
+                AI_piece=p2
+            }
+            else if (first_move=="AI"){
+                Player_piece=p2
+                AI_piece=p1
+            }
+
+            var column: Int
+
+            var emptyCol=getAllEmptyCol(array)
+            var isTerminal=isTerminal(array,0,first_move)
+            if ((depth==0) || (isTerminal[0])|| (isTerminal[1])||(isTerminal[2])){ /* Player_win, AI_win, Draw */
+                if (depth==0){
+                    var minimax_array=arrayOf(-1,heuristicValue(array,AI_piece,Player_piece))
+                    return minimax_array
+                }
+                else /* is terminal */  {
+                    if (isTerminal[1]){
+                        minimax_array=arrayOf(-1,1000000)
+                        return (minimax_array)
+                    }
+                    else if (isTerminal[0]){
+                        minimax_array=arrayOf(-1,-1000000)
+                        return minimax_array
+                    }
+                    else {
+                        minimax_array=arrayOf(-1,0)
+                        return minimax_array
+                    }
+                }
+            }
+            if (maximizingPlayer){
+                var value:Int
+                var alpha1=alpha
+                var beta1=beta
+                value = Int.MIN_VALUE
+                column = emptyCol.random()
+                for (col in emptyCol){
+                    var row = getNextEmptyRow(array, col)
+                    var temp_array=array.copy()
+                    var temp_array2=makeTurn(temp_array,row,col,AI_piece)
+                    var minimax_array = minimax(temp_array2, depth-1, alpha1, beta1, false,first_move)
+                    if (minimax_array[1]>value){
+                        value=minimax_array[1]
+                        column=col
+                    }
+                    alpha1=maxOf(alpha1,value)
+                    if (alpha1>=beta1){
+                        break
+                    }
+                }
+                minimax_array=arrayOf(column,value)
+                return minimax_array
+            }
+            else{  /* MINIMIZE PLAYER */
+                var value:Int
+                var alpha1=alpha
+                var beta1=beta
+                value = Int.MAX_VALUE
+                column = emptyCol.random()
+                for (col in emptyCol){
+                    var row = getNextEmptyRow(array, col)
+                    var temp_array=array.copy()
+                    var temp_array2=makeTurn(temp_array,row,col,Player_piece)
+                    var minimax_array = minimax(temp_array2, depth-1, alpha1, beta1, true,first_move)
+                    if (minimax_array[1]<value){
+                        value=minimax_array[1]
+                        column=col
+                    }
+                    beta1=minOf(beta1,value)
+                    if (alpha1>=beta1){
+                        break
+                    }
+                }
+                minimax_array=arrayOf(column,value)
+                return minimax_array
             }
         }
 
+        fun AI_turn(){
+            if (AIFlag==1){
+                if (first_move=="Player"){
+                    if (Turn%2==0) {
+                        val minimax_final=minimax(array,4, Int.MIN_VALUE, Int.MAX_VALUE,false,first_move)
+                        println(minimax_final[1])
+
+                        arrayOfBut[minimax_final[0]].performClick()
+                    }
+                }
+                else if(first_move=="AI") {
+                    if ((Turn%2!=0)) {
+                        val minimax_final=minimax(array,4, Int.MIN_VALUE, Int.MAX_VALUE,true,first_move)
+                        println(minimax_final[1])
+
+                        arrayOfBut[minimax_final[0]].performClick()
+                    }
+                }
+            }
+        }
 
         fun contCheckWin(array: Array<IntArray>,counter:Int):Boolean{
             checkWin(array,counter)
             if (AIFlag==0){
                 if (p1win){
-                    withButtonCentered(null,"WOW","Congratulations, $name1, you won this game. Check and mate, $name2!",name1,name2,AIFlag)
+                    withButtonCentered(null,"WOW","Congratulations, $name1, you won this game. Check and mate, $name2!",name1,name2,AIFlag,first_move)
                     return true
                 }
                 if (p2win) {
-                    withButtonCentered(null,"WOW","Congratulations, $name2, you won this game. Check and mate, $name1!",name1,name2,AIFlag)
+                    withButtonCentered(null,"WOW","Congratulations, $name2, you won this game. Check and mate, $name1!",name1,name2,AIFlag,first_move)
                     return true
                 }
                 if (draw) {
-                    withButtonCentered(null,"Unfortunately","This game ended by draw, have a good luck next time!",name1,name2,AIFlag)
+                    withButtonCentered(null,"Unfortunately","This game ended by draw, have a good luck next time!",name1,name2,AIFlag,first_move)
                     return true
                 }
             }
             else {
-                if (p1win){
-                    withButtonCentered(null,"WOW","Congratulations, $name1, you won this game. Check and mate, piece of junk!",name1,name2,AIFlag)
-                    return true
+                if (first_move=="Player"){
+                    if (p1win){
+                        withButtonCentered(null,"WOW","Congratulations, $name1, you won this game. Check and mate, piece of junk!",name1,name2,AIFlag,first_move)
+                        return true
+                    }
+                    if (p2win){
+                        withButtonCentered(null,"WOW","Congratulations, my little quantum processor , you won this game. Check and mate, $name1!",name1,name2,AIFlag,first_move)
+                        return true
+                    }
+                    if (draw){
+                        withButtonCentered(null,"Unfortunately","This game ended by draw, have a good luck next time!",name1,name2,AIFlag,first_move)
+                        return true
+                    }
                 }
-                if (p2win){
-                    withButtonCentered(null,"WOW","Congratulations, my little quantum processor , you won this game. Check and mate, $name1!",name1,name2,AIFlag)
-                    return true
+                else {
+                    if (p2win){
+                        withButtonCentered(null,"WOW","Congratulations, $name1, you won this game. Check and mate, piece of junk!",name1,name2,AIFlag,first_move)
+                        return true
+                    }
+                    if (p1win){
+                        withButtonCentered(null,"WOW","Congratulations, my little quantum processor , you won this game. Check and mate, $name1!",name1,name2,AIFlag,first_move)
+                        return true
+                    }
+                    if (draw){
+                        withButtonCentered(null,"Unfortunately","This game ended by draw, have a good luck next time!",name1,name2,AIFlag,first_move)
+                        return true
+                    }
                 }
-                if (draw){
-                    withButtonCentered(null,"Unfortunately","This game ended by draw, have a good luck next time!",name1,name2,AIFlag)
-                    return true
-                }
+
             }
             return false
         }
@@ -439,8 +697,8 @@ class MainActivity : AppCompatActivity() {
                     olist[index].draw(canvas)
                     counter++
 
-
                     if(contCheckWin(array,counter)) break
+
                     AI_turn()
 
                     break
@@ -473,8 +731,8 @@ class MainActivity : AppCompatActivity() {
                     olist[index].draw(canvas)
                     counter++
 
-
                     if(contCheckWin(array,counter)) break
+
                     AI_turn()
 
                     break
@@ -508,8 +766,8 @@ class MainActivity : AppCompatActivity() {
 
                     counter++
 
-
                     if(contCheckWin(array,counter)) break
+
                     AI_turn()
 
                     break
@@ -542,8 +800,8 @@ class MainActivity : AppCompatActivity() {
                     olist[index].draw(canvas)
 
                     counter++
-
                     if(contCheckWin(array,counter)) break
+
                     AI_turn()
 
                     break
@@ -577,8 +835,8 @@ class MainActivity : AppCompatActivity() {
                     olist[index].draw(canvas)
 
                     counter++
-
                     if(contCheckWin(array,counter)) break
+
                     AI_turn()
 
                     break
@@ -615,8 +873,8 @@ class MainActivity : AppCompatActivity() {
                     olist[index].draw(canvas)
 
                     counter++
-
                     if(contCheckWin(array,counter)) break
+
                     AI_turn()
 
                     break
@@ -625,7 +883,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
+        AI_turn()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
