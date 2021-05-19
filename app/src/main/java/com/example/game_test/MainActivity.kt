@@ -343,14 +343,16 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
+        // Array cloning
 
         fun Array<IntArray>.copy() = Array(size) { get(it).clone() }
+        // Checks if column in first row is filled and returns if not
 
         fun empty_col(t_array: Array<IntArray>,coll:Int):Boolean{
             val first_row=0
             return t_array[first_row][coll] == 0
         }
+        // Return unfilled column array ( where first row isn't filled)
 
         fun getAllEmptyCol(t_array: Array<IntArray>):MutableList<Int>{
             val emptyColl= mutableListOf<Int>()
@@ -359,6 +361,7 @@ class MainActivity : AppCompatActivity() {
             }
             return emptyColl
         }
+        // Returns first empty row in a certain column (Finds where piece can be placed in that column)
 
         fun getNextEmptyRow(t_array: Array<IntArray>,coll:Int):Int{
             for(r in 5 downTo 0){
@@ -366,12 +369,14 @@ class MainActivity : AppCompatActivity() {
             }
             return 0
         }
+        // Simple turn maker. Places 1 or 2 in the array
 
         fun makeTurn(t_array: Array<IntArray>,row:Int,coll:Int,player:Int):Array<IntArray>{
             var temp_array=t_array.copy()
             temp_array[row][coll]=player
             return temp_array
         }
+        // Check for terminal node existence (win or draw).
 
         fun isTerminal(t_array: Array<IntArray>,temp_counter:Int,first_move:String):Array<Boolean> {
             checkWin(t_array, temp_counter)
@@ -393,6 +398,8 @@ class MainActivity : AppCompatActivity() {
             return t_array
         }
 
+        //Return array of all row in a certain column
+
         fun makeColArray(t_array:Array<IntArray>,column:Int):MutableList<Int>{
             var col_array=mutableListOf<Int>()
             for (r in 5 downTo 0){
@@ -400,6 +407,7 @@ class MainActivity : AppCompatActivity() {
             }
             return col_array
         }
+        //Return array of all columns in a certain row
 
         fun makeRowArray(t_array:Array<IntArray>,row:Int):MutableList<Int>{
             var row_array=mutableListOf<Int>()
@@ -410,7 +418,7 @@ class MainActivity : AppCompatActivity() {
             return row_array
         }
 
-
+        // Evaluates given array by counting piece of different players in it and returns score
 
         fun evaluateArea(area: MutableList<Int>, AI:Int ,Player:Int):Int{
             var score=0
@@ -418,17 +426,17 @@ class MainActivity : AppCompatActivity() {
             var piece = AI
             if (piece==Player) opp_piece = AI
 
-            if ((area.count {it==piece})==4) score+=100
-            else if (((area.count {it==piece})==3) && ((area.count {it==0})==1)) score+=5
-            else if (((area.count {it==piece})==2) && ((area.count {it==0})==2)) score+=2
-            if (((area.count {it==opp_piece})==3) && ((area.count {it==0})==1)) score-=4
+            if ((area.count {it==piece})==4) score+=1000
+            else if (((area.count {it==piece})==3) && ((area.count {it==0})==1)) score+=10
+            else if (((area.count {it==piece})==2) && ((area.count {it==0})==2)) score+=4
+            if (((area.count {it==opp_piece})==3) && ((area.count {it==0})==1)) score-=8
 
             return score
 
 
         }
 
-
+        // Evaluates node by making 4x4 areas, in which calculates heuristic value and then sums and return it as general heuristic value of node.
 
         fun heuristicValue(t_array: Array<IntArray>, AI:Int ,Player:Int):Int{
             var score:Int=0
@@ -438,7 +446,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             var centerCount=center_array.count {it==AI}
-            score+=centerCount*3
+            score+=centerCount*6
 
             // Horizontal
             for (r in 5 downTo 0){
@@ -480,6 +488,14 @@ class MainActivity : AppCompatActivity() {
 
         return score
         }
+
+        // Minimax algorithm with depth and alpha-beta pruning for speed increase.
+        // Node is a common array with players and AI movements.
+        // After checking array(node) for terminal state or depth 0, in cycle of all available columns(a.k.a all possible movements) make a temporary array, in which makes all changes to prevent original array from changing.
+        // Make a turn in temporary array and applies minimax to this temporary array with a turn (Recursion activated)
+        // As terminal node or depth is reached 0, algorithm starts evaluating arrays and return heuristic values of them in descent order because of recursion (how minimax works)
+        // Returning values, they are evaluating by each other to find a most profitable turn ( column, in which AI will make a turn)
+        // With alpha-beta pruning algorithm cuts off unprofitable turns, increasing speed of AI decision
 
         fun minimax(array: Array<IntArray>, depth: Int,alpha:Int, beta:Int, maximizingPlayer:Boolean,first_move:String):Array<Int>{
             var minimax_array: Array<Int>
@@ -572,7 +588,7 @@ class MainActivity : AppCompatActivity() {
                 if (first_move=="Player"){
                     if (Turn%2==0) {
                         val minimax_final=minimax(array,4, Int.MIN_VALUE, Int.MAX_VALUE,false,first_move)
-                        println(minimax_final[1])
+                        // println(minimax_final[1])
 
                         arrayOfBut[minimax_final[0]].performClick()
                     }
@@ -580,7 +596,7 @@ class MainActivity : AppCompatActivity() {
                 else if(first_move=="AI") {
                     if ((Turn%2!=0)) {
                         val minimax_final=minimax(array,4, Int.MIN_VALUE, Int.MAX_VALUE,true,first_move)
-                        println(minimax_final[1])
+                        // println(minimax_final[1])
 
                         arrayOfBut[minimax_final[0]].performClick()
                     }
